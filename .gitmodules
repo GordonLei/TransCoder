@@ -1,0 +1,3 @@
+[submodule "XLM/tools/fastBPE"]
+	path = XLM/tools/fastBPE
+	url = https://github.com/glample/fastBPE
