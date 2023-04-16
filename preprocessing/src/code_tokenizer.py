@@ -19,9 +19,10 @@ import preprocessing.src.javalang_tokenizer as javalang_tok
 from clang.cindex import TokenKind
 from preprocessing.src.timeout import timeout, TimeoutError
 from sacrebleu import tokenize_v14_international
+from ctypes.util import find_library
 
 TOK_NO_SPACE_BEFORE = {',', ';'}
-clang.cindex.Config.set_library_path('/usr/lib/llvm-7/lib/')
+clang.cindex.Config.set_library_path('/usr/lib/x86_64-linux-gnu')
 STRINGS_AND_COMMENTS_TOKEN_KINDS = {TokenKind.LITERAL, TokenKind.COMMENT}
 logging.basicConfig(
     filename='timeout_cpp_tokenizer_examples.log', level=logging.DEBUG)
