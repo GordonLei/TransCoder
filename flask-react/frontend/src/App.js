@@ -3,6 +3,8 @@ import logo from "./logo.svg";
 import "./App.css";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import output from './output.txt'
+
 import {
   Col,
   Row,
@@ -19,29 +21,50 @@ import { UploadOutlined } from "@ant-design/icons";
 
 const { TextArea } = Input;
 
-const props = {
-  name: "file",
-  //  action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
-  action: "http://localhost:5000/uploadFile",
-  headers: {
-    authorization: "authorization-text",
-  },
-  onChange(info) {
-    if (info.file.status !== "uploading") {
-      console.log(info.file, info.fileList);
-    }
-    if (info.file.status === "done") {
-      message.success(`${info.file.name} file uploaded successfully`);
-    } else if (info.file.status === "error") {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
-};
+
 
 function App() {
   //  states and hooks
   // eslint-disable-next-line
   const [getMessage, setGetMessage] = useState({});
+  const [sourceLang, setSourceLang] = useState("java");
+  const [targetLang, setTargetLang] = useState("python");
+  const [fileText, setFileText] = useState("")
+  const [currFile, setCurrFile] = useState("")
+  //
+  const props = {
+    name: "file",
+    //  action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
+    action: "http://localhost:5000/uploadFile",
+    body: {
+      sourceLang: sourceLang,
+      targetLang: targetLang
+    },
+    headers: {
+      authorization: "authorization-text",
+      sourceLang: sourceLang,
+      targetLang: targetLang
+    },
+    async onChange(info) {
+      if (info.file.status !== "uploading") {
+        console.log(info.file, info.fileList);
+      }
+      if (info.file.status === "done") {
+        message.success(`${info.file.name} file uploaded successfully`);
+
+          fetch(output)
+          .then((r) => r.text())
+          .then(text  => {
+            console.log(text);
+            setFileText(text)
+          })  
+
+        setCurrFile(`${info.file.name}`)
+      } else if (info.file.status === "error") {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
+  };
   //  useEffect
   useEffect(() => {
     axios
@@ -53,6 +76,14 @@ function App() {
       .catch((error) => {
         console.log(error);
       });
+      fetch(output)
+      .then((r) => {
+        console.log(r)
+        return r.text()})
+      .then(text  => {
+        console.log(text);
+        setFileText(text)
+      })  
   }, []);
   //  functions
   const onFinish = (values) => {
@@ -63,9 +94,29 @@ function App() {
     console.log("Failed:", errorInfo);
   };
 
-  const handleChange = (value) => {
+  const handleSourceChange = (value) => {
+    setSourceLang(value)
     console.log(`selected ${value}`);
   };
+
+  const handleTargetChange = (value) => {
+    setTargetLang(value)
+    console.log(`selected ${value}`);
+  };
+
+  const showFile = async (e) => {
+    e.preventDefault()
+    const reader = new FileReader()
+    reader.onload = async (e) => { 
+      const text = (e.target.result)
+      console.log(text)
+      alert(text)
+    };
+    reader.readAsText(e.target.files[0])
+  }
+
+
+  //
 
   return (
     <div className="App">
@@ -107,22 +158,53 @@ function App() {
               >
                 <Space wrap>
                   <Select
+                    defaultValue="Java"
+                    style={{
+                      width: 120,
+                    }}
+                    onChange={handleSourceChange}
+                    options={[
+                      {
+                        value: "python",
+                        label: "Python",
+                      },
+                      {
+                        value: "cpp",
+                        label: "C++",
+                      },
+                      {
+                        value: "java",
+                        label: "Java",
+                      },
+                    ]}
+                  />
+                </Space>
+              </Form.Item>
+              {/* */}
+              <Form.Item
+                label="Select Target Language"
+                rules={[
+                  { required: true, message: "Please select target language!" },
+                ]}
+              >
+                <Space wrap>
+                  <Select
                     defaultValue="Python"
                     style={{
                       width: 120,
                     }}
-                    onChange={handleChange}
+                    onChange={handleTargetChange}
                     options={[
                       {
-                        value: "Python",
+                        value: "python",
                         label: "Python",
                       },
                       {
-                        value: "C++",
+                        value: "cpp",
                         label: "C++",
                       },
                       {
-                        value: "Java",
+                        value: "java",
                         label: "Java",
                       },
                     ]}
@@ -149,7 +231,12 @@ function App() {
           </Card>
           col-12
         </Col>
-        <Col span={12}>col-12</Col>
+        <Col span={12} style={{textAlign: "left"}}>
+        <Space >
+           <pre>{fileText}</pre>
+           </Space>
+        
+          col-12</Col>
       </Row>
     </div>
   );

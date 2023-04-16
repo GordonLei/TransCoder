@@ -1,0 +1,22 @@
+====================
+@ SuppressLint ( "NewApi" ) public static void computeTimeDifference ( Calendar t1 , Calendar t2 , Calendar difference ) {
+  Calendar t1 , t2 , difference ;
+  System . out . println ( "Enter start time." ) ;
+  System . out . println ( "Enter hours, minutes and seconds respectively: " ) ;
+  t1 . set ( Calendar . HOUR_OF_DAY , 0 ) ;
+  t1 . set ( Calendar . MINUTE , 0 ) ;
+  t1 . set ( Calendar . SECOND , 0 ) ;
+  t1 . set ( Calendar . MILLISECOND , 0 ) ;
+  System . out . println ( "Enter stop time." ) ;
+  System . out . println ( "Enter hours, minutes and seconds respectively: " ) ;
+  t2 . set ( Calendar . HOUR_OF_DAY , 0 ) ;
+  t2 . set ( Calendar . MINUTE , 0 ) ;
+  t2 . set ( Calendar . SECOND , 0 ) ;
+  t2 . set ( Calendar . MILLISECOND , 0 ) ;
+  computeTimeDifference ( t1 , t2 , difference ) ;
+  System . out . println ( ) ;
+  System . out . println ( "TIME DIFFERENCE: " + t1 . get ( Calendar . HOUR_OF_DAY ) + ":" + t1 . get ( Calendar . MINUTE ) + ":" + t1 . get ( Calendar . SECOND ) ) ;
+  System . out . println ( " - " + t2 . get ( Calendar . HOUR_OF_DAY ) + ":" + t2 . get ( Calendar . MINUTE ) + ":" + t2 . get ( Calendar . SECOND ) ) ;
+  System . out . println ( " = " + difference . get ( Calendar . HOUR_OF_DAY ) + ":" + difference . get ( Calendar . MINUTE ) + ":" + difference . get ( Calendar . SECOND ) ) ;
+}
+

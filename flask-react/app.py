@@ -24,15 +24,25 @@ def runScript():
 @app.route("/uploadFile", methods=["POST"])
 def uploadFile():
     print("REQUEST", request.files)
+    print("BODY", request.headers)
     f = request.files['file']
     #   f.save(f.filename)
     f.save(f"data/{f.filename}" )
     print(f)
-    srcLang = "java"
-    tgtLang = "python"
-    modelPath = "../model_2.pth"
+    srcLang = request.headers["Sourcelang"]
+    tgtLang = request.headers["Targetlang"]
+    modelPath = "../model_1.pth"
+    if (srcLang == "cpp" and tgtLang == "java") or \
+        (srcLang == "java" and tgtLang == "cpp") or \
+        (srcLang == "java" and tgtLang == "python"):
+            modelPath = "../model_1.pth"
+    elif (srcLang == "cpp" and tgtLang == "python") or \
+    (srcLang == "python" and tgtLang == "cpp") or \
+    (srcLang == "python" and tgtLang == "java"):
+        modelPath = "../model_2.pth"
+    print(f"python ../translate.py --src_lang {srcLang} --tgt_lang {tgtLang} --model_path {modelPath} --BPE_path ../data/BPE_with_comments_codes < data/{f.filename} > frontend/src/output.txt")
     #p = subprocess.run(["python","../translate.py","--src_lang","cpp","--tgt_lang","java","--model_path","../model_1.pth", "--BPE_path", "../data/BPE_with_comments_codes", ">", f"data/{f.filename}"],  shell=True )
-    p = subprocess.run(f"python ../translate.py --src_lang {srcLang} --tgt_lang {tgtLang} --model_path {modelPath} --BPE_path ../data/BPE_with_comments_codes < data/{f.filename}", shell=True)
+    p = subprocess.run(f"python ../translate.py --src_lang {srcLang} --tgt_lang {tgtLang} --model_path {modelPath} --BPE_path ../data/BPE_with_comments_codes < data/{f.filename} > frontend/src/output.txt", shell=True)
     return "saved"
 
     
