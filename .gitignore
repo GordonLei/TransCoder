@@ -161,3 +161,5 @@ cython_debug/
 
 model_1.pth 
 model_2.pth
+
+flask-react/data
