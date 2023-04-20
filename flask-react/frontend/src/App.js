@@ -3,7 +3,7 @@ import logo from "./logo.svg";
 import "./App.css";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import output from './output.txt'
+import output from "./output.txt";
 
 import {
   Col,
@@ -16,12 +16,12 @@ import {
   message,
   Select,
   Space,
+  Typography
 } from "antd";
+
 import { UploadOutlined } from "@ant-design/icons";
-
+const { Title } = Typography;
 const { TextArea } = Input;
-
-
 
 function App() {
   //  states and hooks
@@ -29,8 +29,8 @@ function App() {
   const [getMessage, setGetMessage] = useState({});
   const [sourceLang, setSourceLang] = useState("java");
   const [targetLang, setTargetLang] = useState("python");
-  const [fileText, setFileText] = useState("")
-  const [currFile, setCurrFile] = useState("")
+  const [fileText, setFileText] = useState("");
+  const [currFile, setCurrFile] = useState("");
   //
   const props = {
     name: "file",
@@ -52,18 +52,18 @@ function App() {
       if (info.file.status === "done") {
         message.success(`${info.file.name} file uploaded successfully`);
 
-          fetch(output)
+        fetch(output)
           .then((r) => r.text())
-          .then(text  => {
+          .then((text) => {
             console.log(text);
-            setFileText(text)
-          })  
+            setFileText(text);
+          });
 
-        setCurrFile(`${info.file.name}`)
+        setCurrFile(`${info.file.name}`);
       } else if (info.file.status === "error") {
         message.error(`${info.file.name} file upload failed.`);
       }
-    },
+    }
   };
   //  useEffect
   useEffect(() => {
@@ -76,14 +76,15 @@ function App() {
       .catch((error) => {
         console.log(error);
       });
-      fetch(output)
+    fetch(output)
       .then((r) => {
-        console.log(r)
-        return r.text()})
-      .then(text  => {
+        console.log(r);
+        return r.text();
+      })
+      .then((text) => {
         console.log(text);
-        setFileText(text)
-      })  
+        setFileText(text);
+      });
   }, []);
   //  functions
   const onFinish = (values) => {
@@ -95,26 +96,25 @@ function App() {
   };
 
   const handleSourceChange = (value) => {
-    setSourceLang(value)
+    setSourceLang(value);
     console.log(`selected ${value}`);
   };
 
   const handleTargetChange = (value) => {
-    setTargetLang(value)
+    setTargetLang(value);
     console.log(`selected ${value}`);
   };
 
   const showFile = async (e) => {
-    e.preventDefault()
-    const reader = new FileReader()
-    reader.onload = async (e) => { 
-      const text = (e.target.result)
-      console.log(text)
-      alert(text)
+    e.preventDefault();
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const text = e.target.result;
+      console.log(text);
+      alert(text);
     };
-    reader.readAsText(e.target.files[0])
-  }
-
+    reader.readAsText(e.target.files[0]);
+  };
 
   //
 
@@ -124,20 +124,33 @@ function App() {
     <header className="App-header">
       <img src={logo} className="App-logo" alt="logo" />
       <p>React + Flask Tutorial</p>
-      <div>{getMessage.status === 200 ? 
+      <>{getMessage.status === 200 ? 
         <h3>{getMessage.data.message}</h3>
         :
-        <h3>LOADING</h3>}</div>
+        <h3>LOADING</h3>}</ div>
       </header>
     */}
+      <Row>
+        <Space
+          direction="horizontal"
+          style={{ width: "100%", justifyContent: "center" }}
+        >
+          <Title>Magic Code Genie</Title>
+        </Space>
+      </Row>
+      <Row>
+        <Space
+          direction="horizontal"
+          style={{ width: "100%", justifyContent: "center" }}
+        >
+          <Title level={4}>
+            Translate your C++, Python, or Java SourceCode among each other!
+          </Title>
+        </Space>
+      </Row>
 
       <Row>
-        <Col span={12}>
-          
-            <Upload {...props}>
-            <Button icon={<UploadOutlined />}>Click to Upload</Button>
-          </Upload>
-    
+        <Col span={12} className="pa-4">
           <Card>
             <Form
               name="basic"
@@ -153,29 +166,29 @@ function App() {
               <Form.Item
                 label="Select Source Language"
                 rules={[
-                  { required: true, message: "Please select source language!" },
+                  { required: true, message: "Please select source language!" }
                 ]}
               >
                 <Space wrap>
                   <Select
                     defaultValue="Java"
                     style={{
-                      width: 120,
+                      width: 120
                     }}
                     onChange={handleSourceChange}
                     options={[
                       {
                         value: "python",
-                        label: "Python",
+                        label: "Python"
                       },
                       {
                         value: "cpp",
-                        label: "C++",
+                        label: "C++"
                       },
                       {
                         value: "java",
-                        label: "Java",
-                      },
+                        label: "Java"
+                      }
                     ]}
                   />
                 </Space>
@@ -184,34 +197,40 @@ function App() {
               <Form.Item
                 label="Select Target Language"
                 rules={[
-                  { required: true, message: "Please select target language!" },
+                  { required: true, message: "Please select target language!" }
                 ]}
               >
                 <Space wrap>
                   <Select
                     defaultValue="Python"
                     style={{
-                      width: 120,
+                      width: 120
                     }}
                     onChange={handleTargetChange}
                     options={[
                       {
                         value: "python",
-                        label: "Python",
+                        label: "Python"
                       },
                       {
                         value: "cpp",
-                        label: "C++",
+                        label: "C++"
                       },
                       {
                         value: "java",
-                        label: "Java",
-                      },
+                        label: "Java"
+                      }
                     ]}
                   />
                 </Space>
               </Form.Item>
               {/* */}
+
+              <Upload {...props} className="pa-4">
+                <Button icon={<UploadOutlined />}>Click to Upload</Button>
+              </Upload>
+
+              {/* 
               <Form.Item
                 label="Input Code"
                 rules={[{ required: true, message: "Please input your code!" }]}
@@ -227,16 +246,15 @@ function App() {
                   Submit
                 </Button>
               </Form.Item>
+              */}
             </Form>
           </Card>
-          col-12
         </Col>
-        <Col span={12} style={{textAlign: "left"}}>
-        <Space >
-           <pre>{fileText}</pre>
-           </Space>
-        
-          col-12</Col>
+        <Col span={12} style={{ textAlign: "left" }}>
+          <Space>
+            <pre>{fileText}</pre>
+          </Space>
+        </Col>
       </Row>
     </div>
   );
