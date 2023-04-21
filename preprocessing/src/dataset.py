@@ -20,7 +20,7 @@ class Language:
         assert self.folder.is_dir(
         ), f"failed to initalize Language {self.l}, there is no directory {str(self.folder)}"
         self.l = lang
-
+    #   tokenize JSON file (testing dataset is zipped in a JSON file)
     def process_json_and_tok(self, keep_comments, executor=None):
         if executor is None:
             executor = LocalExecutor()
@@ -37,7 +37,8 @@ class Language:
                 job.result()
         else:
             return
-
+        
+    #   splitting training and testing set
     def split_train_test_valid(self, keep_comments, test_size=1000):
         suffix = '.with_comments' if keep_comments else ''
 
@@ -66,6 +67,7 @@ class Language:
 
         return n_lines, size_gb
 
+    #   DRIVER CODE TO PROCESS THE JSON TESTING SET
     def process(self, keep_comments, tok_executor=None, test_size=1000, split_executor=None):
         suffix = '.with_comments' if keep_comments else ''
         print(f"{self.l}: process ...")
@@ -89,6 +91,7 @@ class Language:
         # nlines, size = self.split_train_test_valid(keep_comments, test_size)
         return nlines, size_gb
 
+    #   get all the functions in the training set?
     def extract_functions(self, keep_comments, test_size=1000, executor=None):
         if executor is None:
             executor = LocalExecutor()
@@ -104,6 +107,7 @@ class Language:
             for job in jobs:
                 job.result()
 
+    #   get all the docStrings in the training set?
     def extract_docstrings(self, keep_comments, test_size=1000, executor=None):
         if executor is None:
             executor = LocalExecutor()
@@ -157,6 +161,7 @@ class Dataset:
         if not self.folder.is_dir():
             self.folder.mkdir()
 
+    #   calls a DELAYED JOB that calls a function to PROCESS and make the dataset? 
     def process_languages(self, lang_executor=None, tok_executor=None, split_executor=None):
         if lang_executor is None:
             lang_executor = LocalExecutor()
@@ -165,6 +170,7 @@ class Dataset:
         for i, lang in enumerate(self.langs):
             self.sizes[lang.l] = jobs[i].result()
 
+    #   trains BPE
     def train_bpe(self, ncodes, size_gb=None):
 
         if self.codes.is_file():
@@ -194,6 +200,8 @@ class Dataset:
         print(f"training bpe on {data_train_bpe}...")
         learn_bpe_file(data_train_bpe, ncodes, self.codes)
 
+    #   get the file that represents the vocabulary. It's like some sort of key-value pair 
+    #       of Character + some number (an ID?)
     def get_vocab(self, size_gb=None):
 
         if self.vocab.is_file():
@@ -219,6 +227,7 @@ class Dataset:
         print(f"computing vocab on {data_get_vocab}...")
         get_vocab_file(data_get_vocab, self.vocab)
 
+    #   apply BPE (Byte-Pair Encoding)  to the tokens. 
     def apply_bpe(self, files_regex, use_vocab=False, executor=None):
         vocab = '' if use_vocab is False else self.vocab
         if executor is None:
@@ -235,6 +244,7 @@ class Dataset:
         for job in jobs:
             job.result()
 
+    #   binarize to make stuff smaller for XLM ???
     def binarize_for_XLM(self, files_regex, executor=None):
         print(f"binarize {files_regex} ...")
         if executor is None:
@@ -249,6 +259,7 @@ class Dataset:
         for job in jobs:
             job.result()
 
+    #   get all the functions and apply BPE from the training and testing set
     def extract_functions_and_apply_bpe(self, lang_executor=None, function_executor=None, bpe_executor=None):
         print("extract functions ... ")
         if lang_executor is None:

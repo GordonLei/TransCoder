@@ -14,7 +14,7 @@ from submitit import AutoExecutor
 import subprocess
 from pathlib import Path
 
-
+#   make sure the files exist and create SYMLINKs for each file
 def check_files_and_symlink_for_XLM(dataset, langs):
     # create symlink for all code - used for MLM pretraining
     print("check that all files exist...")
@@ -41,7 +41,12 @@ def check_files_and_symlink_for_XLM(dataset, langs):
             create_symlink(dataset.folder.joinpath(f"{lang}.valid{dataset.suffix}{cat}.bpe.pth"),
                            XLM_folder.joinpath(f"valid.{lang}{suffixs[cat]}.pth"))
 
-
+#   driver code that runs all the steps to pre-process
+#       STEPS -->
+#           Process step (get tokenization information and how to do it?) 
+#           Do some set up where BPE is "learned" on the training set
+#           Apply the BPE to the training set 
+#           Binarize the BPED'd info for XLM
 def preprocess(root, lang1, lang2, keep_comments, local, lang3=None, test_size=1000, ncodes=100000, size_gb=50):
     if size_gb < 1:
         size_gb = None

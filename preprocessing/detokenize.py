@@ -13,7 +13,7 @@ from pathlib import Path
 
 import preprocessing.src.code_tokenizer as code_tokenizer
 
-
+#  "Translating" part of transferring the token into code
 def detokenize(input_path, language):
     output_path = input_path.with_suffix('.detok')
     if output_path.is_file():

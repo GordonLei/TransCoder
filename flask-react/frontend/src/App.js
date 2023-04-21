@@ -4,7 +4,7 @@ import "./App.css";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import output from "./output.txt";
-
+import { gray, green, cyan } from "@ant-design/colors";
 import {
   Col,
   Row,
@@ -250,9 +250,19 @@ function App() {
             </Form>
           </Card>
         </Col>
-        <Col span={12} style={{ textAlign: "left" }}>
+        <Col
+          span={12}
+          style={{
+            textAlign: "left",
+
+            overflow: "auto"
+          }}
+          className="pa-4"
+        >
           <Space>
-            <pre>{fileText}</pre>
+            <Card style={{ backgroundColor: cyan[9], color: green[4] }}>
+              <pre>{fileText}</pre>
+            </Card>
           </Space>
         </Col>
       </Row>

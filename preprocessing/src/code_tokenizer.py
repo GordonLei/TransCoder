@@ -26,9 +26,10 @@ clang.cindex.Config.set_library_path('/usr/lib/x86_64-linux-gnu')
 STRINGS_AND_COMMENTS_TOKEN_KINDS = {TokenKind.LITERAL, TokenKind.COMMENT}
 logging.basicConfig(
     filename='timeout_cpp_tokenizer_examples.log', level=logging.DEBUG)
-
+#   clang is for translating C++ code into machine code
+# provides an interface to the Clang indexing library. It is a low-level interface to the indexing library which attempts to match the Clang API directly while also being “pythonic”.
 idx = clang.cindex.Index.create()
-
+#   Token to specific JAVA character
 JAVA_TOKEN2CHAR = {'STOKEN0': "//",
                    'STOKEN1': "/*",
                    'STOKEN2': "*/",
@@ -37,6 +38,7 @@ JAVA_TOKEN2CHAR = {'STOKEN0': "//",
                    'STOKEN5': '"""',
                    'STOKEN6': '\\n'
                    }
+#   Java char to token
 JAVA_CHAR2TOKEN = {"//": ' STOKEN0 ',
                    "/*": ' STOKEN1 ',
                    "*/": ' STOKEN2 ',
@@ -61,7 +63,7 @@ PYTHON_CHAR2TOKEN = {'#': ' STOKEN0 ',
                      "'''": ' STOKEN3 '
                      }
 
-
+#   generator for clang object
 class ind_iter(object):
     def __init__(self, len):
         self.i = 0
@@ -77,7 +79,8 @@ class ind_iter(object):
         if self.i < 0:
             raise StopIteration
 
-
+#   parameter is 
+#       current token, Dicts to translate token to code and vice verse, checking if comment
 def process_string(tok, char2tok, tok2char, is_comment):
     if is_comment:
         tok = re.sub(' +', ' ', tok)
@@ -102,7 +105,7 @@ def process_string(tok, char2tok, tok2char, is_comment):
 
     return tok
 
-
+#   translate python code to tokens
 def tokenize_python(s, keep_comments=False):
     try:
         assert isinstance(s, str)
@@ -182,7 +185,7 @@ def tokenize_python(s, keep_comments=False):
     except:
         return []
 
-
+#   convert tokens into python code
 def detokenize_python(s):
     try:
         assert isinstance(s, str) or isinstance(s, list)
@@ -233,7 +236,7 @@ def detokenize_python(s):
     except:
         return ''
 
-
+#   REGEX expression I think to parse through functions with docstrings
 def extract_functions_python_with_docstring(function):
     ds = re.findall(
         "[:][ ][N][E][W][_][L][I][N][E][ ][I][N][D][E][N][T][ ]['][']['].*?['][']['][ ][N][E][W][_][L][I][N][E]|[:][ ][N][E][W][_][L][I][N][E][ ][I][N][D][E][N][T][ ][\"][\"][\"].*?[\"][\"][\"][ ][N][E][W][_][L][I][N][E]",
@@ -254,7 +257,7 @@ def extract_functions_python_with_docstring(function):
     else:
         return '', ''
 
-
+#   tokenize python functions. Deals with de-indent and indents of Python functions
 def extract_functions_python(s):
     tokens = iter(s.split())
     functions_standalone = []
@@ -295,7 +298,7 @@ def extract_functions_python(s):
             break
     return functions_standalone, functions_class
 
-
+#   make sure functions are of Python2
 def filter_functions_python_2_3(function):
     if (re.search("print [^(]", function) is None and
             re.search("raise \w+ ,", function) is None and
@@ -310,14 +313,14 @@ def filter_functions_python_2_3(function):
     else:
         return None
 
-
+#   retrieve function names
 def get_function_name_python(s):
     assert isinstance(s, str) or isinstance(s, list)
     if isinstance(s, str):
         s = s.split()
     return s[s.index('def') + 1]
 
-
+#   retrieve CPP tokens and types and return them as a list 
 @timeout(10)
 def get_cpp_tokens_and_types(s):
     tokens = []
@@ -330,7 +333,7 @@ def get_cpp_tokens_and_types(s):
         tokens.append((tok.spelling, tok.kind))
     return tokens
 
-
+#   actual tokenization prcoess of CPP code
 def tokenize_cpp(s, keep_comments=False):
     tokens = []
     assert isinstance(s, str)
@@ -361,7 +364,7 @@ def tokenize_cpp(s, keep_comments=False):
     except:
         return []
 
-
+#   tokenize java source code
 def tokenize_java(s, keep_comments=False):
     try:
         tokens = []
@@ -384,7 +387,7 @@ def tokenize_java(s, keep_comments=False):
     except:
         return []
 
-
+#   convert tokens into CPP code
 def detokenize_cpp(s):
     assert isinstance(s, str) or isinstance(s, list)
     if isinstance(s, list):
@@ -439,7 +442,7 @@ def detokenize_cpp(s):
         'CB_COMA', '},').replace('CB_', '}').replace('OB_', '{')
     return untok_s
 
-
+#   deal within indenting code
 def indent_lines(lines):
     prefix = ''
     for i, line in enumerate(lines):
@@ -456,7 +459,7 @@ def indent_lines(lines):
     untok_s = '\n'.join(lines)
     return untok_s
 
-
+#   convert tokens into Java code
 def detokenize_java(s):
     assert isinstance(s, str) or isinstance(s, list)
     if isinstance(s, list):
@@ -494,7 +497,7 @@ def detokenize_java(s):
         pass
     return untok_s
 
-
+#   Convert tokens into Java functions
 def extract_functions_java(s):
     tokens = s.split()
     i = ind_iter(len(tokens))
@@ -569,7 +572,7 @@ def extract_functions_java(s):
             break
     return functions_standalone, functions_class
 
-
+#   Convert tokens with docstrings into Java functions
 def extract_functions_java_with_docstring(function):
     ds = re.findall('[/][*].*?[*][/][ ]', function, re.DOTALL)
     if len(ds) > 0:
@@ -588,7 +591,7 @@ def extract_functions_java_with_docstring(function):
     else:
         return '', ''
 
-
+#   preprocessing of CPP's standard libraries 
 def clean_hashtags_functions_cpp(function):
     function = re.sub('[#][ ][i][n][c][l][u][d][e][ ]["].*?["]', "", function)
     function = re.sub('[#][ ][i][n][c][l][u][d][e][ ][<].*?[>]', "", function)
@@ -611,7 +614,7 @@ def clean_hashtags_functions_cpp(function):
     function = function.strip()
     return function
 
-
+#   from CPP function, tokenize it 
 def extract_functions_cpp(s):
     try:
         s = clean_hashtags_functions_cpp(s)
@@ -699,7 +702,7 @@ def extract_functions_cpp(s):
             break
     return functions_standalone, functions_class
 
-
+#   tokenize CPP functions that have docstrings
 def extract_functions_cpp_with_docstring(function):
     function = re.sub("[<][ ][D][O][C][U][M][E][N][T].*?[>] ", "", function)
     ds = re.findall('[/][*].*?[*][/][ ]', function, re.DOTALL)
@@ -719,11 +722,11 @@ def extract_functions_cpp_with_docstring(function):
     else:
         return '', ''
 
-
+#   remove annotations of Java code
 def remove_java_annotation(function):
     return re.sub('^(@ (Override|Deprecated|SuppressWarnings) (\( .* \) )?)*', '', function)
 
-
+#   get any information before data (for example, function names)
 def get_first_token_before_first_parenthesis(s):
     assert isinstance(s, str) or isinstance(s, list)
     if isinstance(s, str):
@@ -746,7 +749,7 @@ def extract_arguments_java(f):
 def extract_arguments_cpp(f):
     return extract_arguments_java_using_parentheses(f)
 
-
+#   from java code, retrieve the arguements you feed into function
 def extract_arguments_java_using_parentheses(f):
     f = f.split(' ')
     types = []
